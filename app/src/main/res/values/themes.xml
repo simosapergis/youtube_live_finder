@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.Youtube_open_live" parent="Theme.AppCompat.DayNight.NoActionBar" />
+</resources>
