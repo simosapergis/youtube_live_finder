@@ -7,6 +7,7 @@ import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.widget.TextView
+import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -82,7 +83,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun launchYoutube(videoId: String) {
-        Log.i("MainActivity", "Launch yt with url")
+        Log.i("MainActivity", "Launch yt with url and boot")
+        Toast.makeText(this, "**Device booted, starting MainActivity right now(((", Toast.LENGTH_LONG).show()
+
         //val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
 
 //        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
