@@ -33,9 +33,9 @@ class MainActivity : AppCompatActivity() {
         apiResponseTextView = findViewById(R.id.apiResponseTextView)
 
         Log.i("MainActivity", "on create loaded")
-//        val videoId = "3YixFv5E8m0" // Replace with the actual video ID
-//        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
-//        intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
+        val videoId = "3YixFv5E8m0" // Replace with the actual video ID
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+        intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
 
         CoroutineScope(Dispatchers.Main).launch{
             delay(5000)
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // Start the YouTube app
-//        startActivity(intent)
+        startActivity(intent)
 
         // Optionally, finish the app if you don't want it to remain running
         //finish()

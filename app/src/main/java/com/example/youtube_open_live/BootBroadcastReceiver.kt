@@ -17,10 +17,8 @@ class BootBroadcastReceiver : BroadcastReceiver() {
 
             Toast.makeText(context, "**Device booted, starting MainActivity in a minute", Toast.LENGTH_LONG).show()
 
-//            CoroutineScope(Dispatchers.Main).launch {
-//                delay(60000)
                 runApp(context)
-//            }
+
         }
 
     }
