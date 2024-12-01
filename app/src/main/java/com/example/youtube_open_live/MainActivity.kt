@@ -26,11 +26,26 @@ class MainActivity : AppCompatActivity() {
     private val channelId = "UCoMdktPbSTixAyNGwb-UYkQ" //Random channel id for test
 
 
+    override fun onStart() {
+        super.onStart()
+        Log.i("MainActivity", "onStart called")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.i("MainActivity", "onRestart called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.i("MainActivity", "onStop called")
+    }
+
     override fun onResume() {
         super.onResume()
         // Code to execute when the activity becomes visible and interactive
-        Log.d("MainActivity", "onResume called")
-        Toast.makeText(this, "**On Resume Called", Toast.LENGTH_LONG).show()
+        Log.i("MainActivity", "onResume called")
+//        Toast.makeText(this, "**On Resume Called", Toast.LENGTH_LONG).show()
         // Example: Start refreshing data or resume animations
         //doStuff()
     }
@@ -38,8 +53,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        Log.d("MainActivity", "onPause called")
-        Toast.makeText(this, "**On Pause called", Toast.LENGTH_LONG).show()
+        Log.i("MainActivity", "onPause called")
+//        Toast.makeText(this, "**On Pause called", Toast.LENGTH_LONG).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         apiResponseTextView = findViewById(R.id.apiResponseTextView)
 
-        Log.i("MainActivity", "on create loaded")
+        Log.i("MainActivity", "on create LOADED")
         val videoId = "3YixFv5E8m0" // Replace with the actual video ID
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
         intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
@@ -65,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
         // Optionally, finish the app if you don't want it to remain running
-        finish()
+        //finish()
     }
 
 
