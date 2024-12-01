@@ -25,6 +25,23 @@ class MainActivity : AppCompatActivity() {
     //private val channelId = "UCzDwvIL79I7G5nS6wl4OZQw" //Ενορία Αγίου Παύλου Πειραιά
     private val channelId = "UCoMdktPbSTixAyNGwb-UYkQ" //Random channel id for test
 
+
+    override fun onResume() {
+        super.onResume()
+        // Code to execute when the activity becomes visible and interactive
+        Log.d("MainActivity", "onResume called")
+        Toast.makeText(this, "**On Resume Called", Toast.LENGTH_LONG).show()
+        // Example: Start refreshing data or resume animations
+        //doStuff()
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("MainActivity", "onPause called")
+        Toast.makeText(this, "**On Pause called", Toast.LENGTH_LONG).show()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,8 +65,9 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
         // Optionally, finish the app if you don't want it to remain running
-        //finish()
+        finish()
     }
+
 
     private fun fetchUpcomingLiveEvents() {
         Log.i("MainActivity", "fetchUpcomingLiveEvents called with increased timeout 3")
@@ -84,15 +102,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun launchYoutube(videoId: String) {
         Log.i("MainActivity", "Launch yt with url and boot")
-        Toast.makeText(this, "**Device booted, starting MainActivity right now(((", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "**Device booted, starting MainActivity right now, with yt pkg", Toast.LENGTH_LONG).show()
 
         //val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
 
 //        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$videoId"))
 
-        //val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
-        intent.putExtra("VIDEO_ID", videoId);
+//        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+        intent.setPackage("com.google.android.youtube.tv")
+        intent.putExtra("VIDEO_ID", videoId)
         intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
         // Start the YouTube app
         startActivity(intent)
