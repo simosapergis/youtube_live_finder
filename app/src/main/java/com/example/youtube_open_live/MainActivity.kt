@@ -1,11 +1,13 @@
 package com.example.youtube_open_live
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import android.webkit.WebView
 import android.widget.TextView
 import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
@@ -20,15 +22,18 @@ import java.net.URLEncoder
 class MainActivity : AppCompatActivity() {
 
     private lateinit var apiResponseTextView: TextView
+    private lateinit var webView: WebView
     private val apiKey = "AIzaSyDKD7DkL6i84LCAFgA1UeQ2kWJhS4Z_I4k"
     //private val channelId = "UCzDwvIL79I7G5nS6wl4OZQw" //Ενορία Αγίου Παύλου Πειραιά
     //private val channelId = "UCzDwvIL79I7G5nS6wl4OZQw" //Ενορία Αγίου Παύλου Πειραιά
     private val channelId = "UCoMdktPbSTixAyNGwb-UYkQ" //Random channel id for test
 
 
+
     override fun onStart() {
         super.onStart()
-        Log.i("MainActivity", "onStart called")
+        Log.i("MainActivity", "onStart called, starting fetching next live and starting webview")
+        loadApp()
     }
 
     override fun onRestart() {
@@ -38,7 +43,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        Log.i("MainActivity", "onStop called")
+        Log.i("MainActivity", "onStop called, stopping webView, clearing cache and history")
+        webView.stopLoading()
+        webView.clearCache(true)
+        webView.clearHistory()
     }
 
     override fun onResume() {
@@ -62,46 +70,69 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        webView = findViewById(R.id.youtube_player_view)
         apiResponseTextView = findViewById(R.id.apiResponseTextView)
-
-        Log.i("MainActivity", "on create LOADED")
-        val videoId = "3YixFv5E8m0" // Replace with the actual video ID
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
-        intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
-
-        CoroutineScope(Dispatchers.Main).launch{
-            delay(5000)
-
-            fetchUpcomingLiveEvents()
-        }
+//        apiResponseTextView = findViewById(R.id.apiResponseTextView)
+//
+//        Log.i("MainActivity", "on create LOADED")
+//        val videoId = "3YixFv5E8m0" // Replace with the actual video ID
+//        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+//        intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
+//
+//        CoroutineScope(Dispatchers.Main).launch {
+//            delay(5000)
+//
+//            fetchUpcomingLiveEvents()
+//        }
 
 
         // Start the YouTube app
-        startActivity(intent)
+//        startActivity(intent)
 
         // Optionally, finish the app if you don't want it to remain running
         //finish()
     }
 
+    private fun loadApp() {
+        Log.i("MainActivity", "on create LOADED")
+        val videoId = "3YixFv5E8m0" // Replace with the actual video ID
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+        intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
+
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(5000)
+
+            fetchUpcomingLiveEvents()
+        }
+
+    }
 
     private fun fetchUpcomingLiveEvents() {
         Log.i("MainActivity", "fetchUpcomingLiveEvents called with increased timeout 3")
 
         apiResponseTextView.text = "fetching"
-        val call = RetrofitInstance.api.getUpcomingLiveStreams(channelId = channelId, apiKey = apiKey)
+        val call =
+            RetrofitInstance.api.getUpcomingLiveStreams(channelId = channelId, apiKey = apiKey)
 
         call.enqueue(object : Callback<YoutubeResponse> {
 
-            override fun onResponse(call: Call<YoutubeResponse>, response: Response<YoutubeResponse>) {
+            override fun onResponse(
+                call: Call<YoutubeResponse>,
+                response: Response<YoutubeResponse>
+            ) {
                 Log.i("MainActivity", "response message is ${response.message()}")
 
                 if (response.isSuccessful) {
                     val liveStreams = response.body()?.items
                     liveStreams?.forEach {
-                        Log.i("MainActivity", "Upcoming Live Stream: ${it.snippet.title} at ${it.snippet.publishedAt} videoId ${it.id}")
+                        Log.i(
+                            "MainActivity",
+                            "Upcoming Live Stream: ${it.snippet.title} at ${it.snippet.publishedAt} videoId ${it.id}"
+                        )
                         apiResponseTextView.text = "Upcoming Live Stream videoId: ${it.id.videoId}"
 //                        launchYoutube(it.id.videoId)
-                        launchYoutube("2ClljZaK6_A")
+                        // launchYoutube("2ClljZaK6_A")
+                        loadYoutubeInWebView("2ClljZaK6_A")
                     }
                 } else {
                     Log.e("MainActivity", "API Error: ${response.errorBody()?.string()}")
@@ -115,9 +146,39 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun loadYoutubeInWebView(videoId: String) {
+
+// Enable JavaScript and additional settings
+        webView.settings.javaScriptEnabled = true
+        webView.settings.mediaPlaybackRequiresUserGesture = false // Allow autoplay
+
+// Load YouTube video with autoplay
+        val htmlData = """
+    <html>
+    <body style="margin:0;padding:0;">
+        <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen>
+        </iframe>
+    </body>
+    </html>
+""".trimIndent()
+
+        webView.loadData(htmlData, "text/html", "utf-8")
+    }
+
     private fun launchYoutube(videoId: String) {
         Log.i("MainActivity", "Launch yt with url and boot")
-        Toast.makeText(this, "**Device booted, starting MainActivity right now, with yt pkg", Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            this,
+            "**Device booted, starting MainActivity right now, with yt pkg",
+            Toast.LENGTH_LONG
+        ).show()
 
         //val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
 

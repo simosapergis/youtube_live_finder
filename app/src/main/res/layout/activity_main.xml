@@ -15,4 +15,10 @@
         android:padding="8dp"
         android:textColor="#000" />
 
+    <WebView
+        android:id="@+id/youtube_player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
 </LinearLayout>
