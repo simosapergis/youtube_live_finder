@@ -72,6 +72,13 @@ class MainActivity : AppCompatActivity() {
 
         webView = findViewById(R.id.youtube_player_view)
         apiResponseTextView = findViewById(R.id.apiResponseTextView)
+
+        // Handle new task launches
+        if (intent != null) {
+            val action = intent.action
+            val extras = intent.extras
+            Log.i("MAINACTIVITY", "Launched with action: $action, extras: $extras")
+        }
 //        apiResponseTextView = findViewById(R.id.apiResponseTextView)
 //
 //        Log.i("MainActivity", "on create LOADED")
