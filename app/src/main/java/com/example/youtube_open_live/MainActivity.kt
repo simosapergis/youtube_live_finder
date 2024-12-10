@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.webkit.WebView
@@ -17,7 +16,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.net.URLEncoder
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,8 +24,8 @@ class MainActivity : AppCompatActivity() {
     private val apiKey = "AIzaSyDKD7DkL6i84LCAFgA1UeQ2kWJhS4Z_I4k"
     //private val channelId = "UCzDwvIL79I7G5nS6wl4OZQw" //Ενορία Αγίου Παύλου Πειραιά
     //private val channelId = "UCzDwvIL79I7G5nS6wl4OZQw" //Ενορία Αγίου Παύλου Πειραιά
-    private val channelId = "UCoMdktPbSTixAyNGwb-UYkQ" //Random channel id for test
-
+    private val channelId = "UCoMdktPbSTixAyNGwb-UYkQ" //Random channel id for test #1 a lot of upcoming live videos
+   // private val channelId = "UCH5Iqij-VpBAqUNbuzBIvpw" Upcoming live
 
 
     override fun onStart() {
@@ -102,26 +100,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadApp() {
         Log.i("MainActivity", "on create LOADED")
-        val videoId = "3YixFv5E8m0" // Replace with the actual video ID
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
-        intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
+//        val videoId = "3YixFv5E8m0" // Replace with the actual video ID
+//        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
+//        intent.putExtra("force_fullscreen", true) // Optional: Force full-screen mode
 
         CoroutineScope(Dispatchers.Main).launch {
             delay(5000)
 
-            fetchUpcomingLiveEvents()
+            fetchLiveStream()
         }
 
     }
 
-    private fun fetchUpcomingLiveEvents() {
+    private fun fetchLiveStream() {
         Log.i("MainActivity", "fetchUpcomingLiveEvents called with increased timeout 3")
 
         apiResponseTextView.text = "fetching"
-        val call =
-            RetrofitInstance.api.getUpcomingLiveStreams(channelId = channelId, apiKey = apiKey)
+        val ongoingLiveStream = RetrofitInstance.api.getLiveStream(channelId = channelId, apiKey = apiKey, eventType = "live")
 
-        call.enqueue(object : Callback<YoutubeResponse> {
+        ongoingLiveStream.enqueue(object : Callback<YoutubeResponse> {
 
             override fun onResponse(
                 call: Call<YoutubeResponse>,
@@ -137,9 +134,9 @@ class MainActivity : AppCompatActivity() {
                             "Upcoming Live Stream: ${it.snippet.title} at ${it.snippet.publishedAt} videoId ${it.id}"
                         )
                         apiResponseTextView.text = "Upcoming Live Stream videoId: ${it.id.videoId}"
-//                        launchYoutube(it.id.videoId)
-                        // launchYoutube("2ClljZaK6_A")
-                        loadYoutubeInWebView("2ClljZaK6_A")
+                        //loadYoutubeInWebView("2ClljZaK6_A")
+                        loadYoutubeInWebView(it.id.videoId)
+
                     }
                 } else {
                     Log.e("MainActivity", "API Error: ${response.errorBody()?.string()}")
