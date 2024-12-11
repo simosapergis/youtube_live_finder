@@ -22,10 +22,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var apiResponseTextView: TextView
     private lateinit var webView: WebView
     private val apiKey = "AIzaSyDKD7DkL6i84LCAFgA1UeQ2kWJhS4Z_I4k"
-    //private val channelId = "UCzDwvIL79I7G5nS6wl4OZQw" //Ενορία Αγίου Παύλου Πειραιά
-    //private val channelId = "UCzDwvIL79I7G5nS6wl4OZQw" //Ενορία Αγίου Παύλου Πειραιά
-    private val channelId = "UCoMdktPbSTixAyNGwb-UYkQ" //Random channel id for test #1 a lot of upcoming live videos
-   // private val channelId = "UCH5Iqij-VpBAqUNbuzBIvpw" Upcoming live
+    private val channelId = "UCzDwvIL79I7G5nS6wl4OZQw" //Ενορία Αγίου Παύλου Πειραιά
+//    private val channelId = "UCoMdktPbSTixAyNGwb-UYkQ" //TEST: Random channel id for test #1 a lot of upcoming live videos
+   // private val channelId = "UCH5Iqij-VpBAqUNbuzBIvpw" //TEST: Upcoming live
 
 
     override fun onStart() {
@@ -116,28 +115,35 @@ class MainActivity : AppCompatActivity() {
         Log.i("MainActivity", "fetchUpcomingLiveEvents called with increased timeout 3")
 
         apiResponseTextView.text = "fetching"
-        val ongoingLiveStream = RetrofitInstance.api.getLiveStream(channelId = channelId, apiKey = apiKey, eventType = "live")
 
-        ongoingLiveStream.enqueue(object : Callback<YoutubeResponse> {
+        //TODO Better call apis synchronously. Right now we call them asynchronously and whichever finds an active stream, either live or upcoming, loads it to webview
+        callApiForEventType("live")
+        callApiForEventType("upcoming")
+    }
+
+    private fun callApiForEventType(eventType: String) {
+        val liveStream = RetrofitInstance.api.getLiveStream(channelId = channelId, apiKey = apiKey, eventType = eventType)
+
+        liveStream.enqueue(object : Callback<YoutubeResponse> {
 
             override fun onResponse(
                 call: Call<YoutubeResponse>,
                 response: Response<YoutubeResponse>
             ) {
-                Log.i("MainActivity", "response message is ${response.message()}")
+                Log.i("MainActivity", "Called youtube api for eventType ${eventType} - response message is ${response.message()}")
 
                 if (response.isSuccessful) {
+
                     val liveStreams = response.body()?.items
                     liveStreams?.forEach {
-                        Log.i(
-                            "MainActivity",
-                            "Upcoming Live Stream: ${it.snippet.title} at ${it.snippet.publishedAt} videoId ${it.id}"
-                        )
-                        apiResponseTextView.text = "Upcoming Live Stream videoId: ${it.id.videoId}"
+                        Log.i("MainActivity","Found ${eventType} Stream*: ${it.snippet.title} at ${it.snippet.publishedAt} videoId ${it.id}")
+                        apiResponseTextView.text = "${eventType} Stream : ${it.snippet.title}"
                         //loadYoutubeInWebView("2ClljZaK6_A")
                         loadYoutubeInWebView(it.id.videoId)
-
+                        return
                     }
+
+                    Log.i("MainActivity-->", "This should not be logged >>>")
                 } else {
                     Log.e("MainActivity", "API Error: ${response.errorBody()?.string()}")
                 }
@@ -148,6 +154,7 @@ class MainActivity : AppCompatActivity() {
                 apiResponseTextView.text = "Network Error: ${t.message}"
             }
         })
+
     }
 
     @SuppressLint("SetJavaScriptEnabled")

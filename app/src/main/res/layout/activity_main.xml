@@ -10,7 +10,7 @@
         android:id="@+id/apiResponseTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Response will appear here"
+        android:text="Αναζήτηση..."
         android:textSize="16sp"
         android:padding="8dp"
         android:textColor="#000" />
