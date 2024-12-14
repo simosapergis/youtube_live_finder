@@ -40,8 +40,8 @@ class BootService : Service() {
         }, 3000)
 
         // Stop the service after completing its task
-       // stopForeground(true)
-        //stopSelf()
+        stopForeground(true)
+        stopSelf()
 
         return START_NOT_STICKY
     }
