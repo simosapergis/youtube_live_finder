@@ -26,6 +26,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+
+        webView = findViewById(R.id.youtube_player_view)
+        apiResponseTextView = findViewById(R.id.apiResponseTextView)
+
         Log.i("MainActivity", "onStart called, starting fetching next live and starting webview")
         loadApp()
     }
@@ -44,9 +48,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
-
-        webView = findViewById(R.id.youtube_player_view)
-        apiResponseTextView = findViewById(R.id.apiResponseTextView)
 
         // Handle new task launches
         if (intent != null) {
