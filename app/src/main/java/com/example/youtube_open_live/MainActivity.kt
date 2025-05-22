@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
 //    private val channelId = "UCoMdktPbSTixAyNGwb-UYkQ" //TEST: Random channel id for test #1 a lot of upcoming live videos
    // private val channelId = "UCH5Iqij-VpBAqUNbuzBIvpw" //TEST: Upcoming live
 
+    private var videoLoaded = false
 
     override fun onStart() {
         super.onStart()
@@ -73,11 +74,19 @@ class MainActivity : AppCompatActivity() {
     private fun fetchLiveStream() {
         Log.i("MainActivity", "fetchUpcomingLiveEvents called with increased timeout 3")
 
-        apiResponseTextView.text = "fetching"
+        apiResponseTextView.text = "Αναζήτηση..."
+        videoLoaded = false
 
-        //TODO Better call apis synchronously. Right now we call them asynchronously and whichever finds an active stream, either live or upcoming, loads it to webview
         callApiForEventType("live")
         callApiForEventType("upcoming")
+
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(5000)
+            if (!videoLoaded) {
+                Log.i("MainActivity", "No live or upcoming streams found, loading fallback")
+                loadFallbackWebView()
+            }
+        }
     }
 
     private fun callApiForEventType(eventType: String) {
@@ -97,6 +106,7 @@ class MainActivity : AppCompatActivity() {
                     liveStreams?.forEach {
                         Log.i("MainActivity","Found ${eventType} Stream*: ${it.snippet.title} at ${it.snippet.publishedAt} videoId ${it.id}")
                         apiResponseTextView.text = "${eventType} Stream : ${it.snippet.title}"
+                        videoLoaded = true
                         //loadYoutubeInWebView("2ClljZaK6_A")
                         loadYoutubeInWebView(it.id.videoId)
                         return
@@ -139,5 +149,13 @@ class MainActivity : AppCompatActivity() {
 """.trimIndent()
 
         webView.loadData(htmlData, "text/html", "utf-8")
+    }
+
+    private fun loadFallbackWebView() {
+        apiResponseTextView.text = "Φωτογραφίες"
+        val fallbackUrl = "https://photo-gallery-psi-rouge.vercel.app/"
+        webView.settings.javaScriptEnabled = true
+        webView.settings.mediaPlaybackRequiresUserGesture = false
+        webView.loadUrl(fallbackUrl)
     }
 }
