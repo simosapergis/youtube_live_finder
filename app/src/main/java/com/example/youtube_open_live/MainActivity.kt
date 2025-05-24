@@ -153,9 +153,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFallbackWebView() {
         apiResponseTextView.text = "Φωτογραφίες"
-        val fallbackUrl = "https://photo-gallery-psi-rouge.vercel.app/"
         webView.settings.javaScriptEnabled = true
         webView.settings.mediaPlaybackRequiresUserGesture = false
-        webView.loadUrl(fallbackUrl)
+
+        val htmlData = """
+    <html>
+    <body style="margin:0;padding:0;">
+        <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://photo-gallery-psi-rouge.vercel.app/?token=bG91a2lhR2FsbGVyeTphUzkwQDNkaXJEZjIwMF5qc0Bpbw%3D%3D" 
+            frameborder="0" 
+            allow="autoplay; encrypted-media" 
+            allowfullscreen>
+        </iframe>
+    </body>
+    </html>
+""".trimIndent()
+
+        webView.loadData(htmlData, "text/html", "utf-8")
     }
 }
